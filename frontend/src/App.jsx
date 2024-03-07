@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Form from "./components/Form";
 import Post from "./components/Post";
+import { successToast, errorToast } from "./utils/toast.js";
 
 const urlBaseServer = "http://localhost:3000";
 
@@ -12,25 +13,52 @@ function App() {
   const [posts, setPosts] = useState([]);
 
   const getPosts = async () => {
-    const { data: posts } = await axios.get(urlBaseServer + "/posts");
-    setPosts([...posts]);
+    try {
+      const { data: posts } = await axios.get(urlBaseServer + "/posts");
+      setPosts(posts);
+    } catch (error) {
+      console.error("Error al obtener los posts:", error);
+      errorToast("Error al obtener los posts:");
+    }
   };
 
   const agregarPost = async () => {
-    const post = { titulo, url: imgSrc, descripcion };
-    await axios.post(urlBaseServer + "/posts", post);
-    getPosts();
+    try {
+      const post = { titulo, url: imgSrc, descripcion, likes: 0 };
+      await axios.post(urlBaseServer + "/posts", post);
+      successToast("Post agregado correctamente");
+      await getPosts();
+    } catch (error) {
+      console.error("Error al agregar el post:", error);
+      errorToast("Error al agregar el post");
+    }
   };
 
-  // este método se utilizará en el siguiente desafío
+  //Apliquemos las peticiones PUT-- DELETE-- con fetch--
+
+  // const like = async (id) => {
+  //   const ver = await axios.put(urlBaseServer + `/posts/like/${id}`);
+  //   console.log(ver.data);
+  //   await getPosts();
+  // };
+
   const like = async (id) => {
-    await axios.put(urlBaseServer + `/posts/like/${id}`);
-    getPosts();
+    const res = await fetch(`${urlBaseServer}/posts/like/${id}`, {
+      method: "PUT",
+    });
+    console.log(res);
+    await getPosts();
   };
 
-  // este método se utilizará en el siguiente desafío
+  // const eliminarPost = async (id) => {
+  //   await axios.delete(urlBaseServer + `/posts/${id}`);
+  //   getPosts();
+  // };
+
   const eliminarPost = async (id) => {
-    await axios.delete(urlBaseServer + `/posts/${id}`);
+    await fetch(`${urlBaseServer}/posts/${id}`, {
+      method: "DELETE",
+    });
     getPosts();
   };
 

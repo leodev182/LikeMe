@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { getPost, addPost, changePost, deletePost } = require("./consultas.js");
+const { getPost, addPost, updatePost, deletePost } = require("./consultas.js");
 
 app.use(express.json());
 app.use(cors());
@@ -35,7 +35,7 @@ app.post("/posts", async (req, res) => {
 app.put("/posts/like/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await changePost(id);
+    await updatePost(id);
     res.status(200).json({
       message: "¡El post se modificó correctamente!",
     });

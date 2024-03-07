@@ -10,7 +10,7 @@ const pool = new Pool({
   allowExitOnIdle: true,
 });
 
-const checkPostExistence = (rowCount, errorCode, errorMessage) => {
+const validation = (rowCount, errorCode, errorMessage) => {
   if (rowCount === 0) {
     throw { code: errorCode, message: errorMessage };
   }
@@ -39,7 +39,7 @@ const addPost = async (titulo, img, descrip, likes) => {
       descrip,
       likes,
     ]);
-    checkPostExistence(rowCount, 500, "Error al agregar el post");
+    validation(rowCount, 500, "Error al agregar el post");
     return "Post agregado exitosamente";
   } catch (error) {
     console.error("Error al agregar datos:", error);
@@ -47,11 +47,11 @@ const addPost = async (titulo, img, descrip, likes) => {
   }
 };
 
-const changePost = async (id) => {
+const updatePost = async (id) => {
   try {
     const consulta = "UPDATE posts SET likes = likes + 1 WHERE id = $1";
     const { rowCount } = await pool.query(consulta, [id]);
-    checkPostExistence(rowCount, 404, "No se encontró ningún post con este ID");
+    validation(rowCount, 404, "No se encontró ningún post con este ID");
   } catch (error) {
     console.error("Error al cambiar los datos:", error);
     throw error;
@@ -62,11 +62,11 @@ const deletePost = async (id) => {
   try {
     const consulta = "DELETE FROM posts WHERE id = $1";
     const { rowCount } = await pool.query(consulta, [id]);
-    checkPostExistence(rowCount, 404, "No se encontró ningún post con este ID");
+    validation(rowCount, 404, "No se encontró ningún post con este ID");
   } catch (error) {
     console.error("Error al eliminar datos:", error);
     throw error;
   }
 };
 
-module.exports = { getPost, addPost, changePost, deletePost };
+module.exports = { getPost, addPost, updatePost, deletePost };
